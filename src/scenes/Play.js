@@ -13,8 +13,8 @@ class Play extends Phaser.scene {
 
     create() {
         // Inputs
-        keyG = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.G)
-        keyR = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R)
+        keyUP = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP)
+        keyDOWN = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN)
         keyLEFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT)
         keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT)
 
@@ -105,4 +105,15 @@ class Play extends Phaser.scene {
     //         this.sound.play('sfx_explosion4');
     //     }
     // }
+}
+class Play extends Phaser.Scene {
+    constructor() {
+        super("playScene");
+    }
+
+    preload() {
+        this.load.image('background','./assets/background.png');
+        this.load.image('wizard','./assets/wizard.png');
+        this.load.image('bat', './assets/bat.png');
+    }
 }

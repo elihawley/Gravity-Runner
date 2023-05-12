@@ -4,7 +4,10 @@ class Menu extends Phaser.Scene {
     }
 
     preload() {
-        // this.load.audio('sfx_select', './assets/blip_select12.wav');
+        this.load.audio('sfx_select', './assets/select.wav');
+        this.load.audio('sfx_gameover', './assets/gameover.wav');
+        this.load.audio('sfx_changegravity', './assets/changegravity.wav');
+        this.load.audio('sfx_music', './assets/backgroundmusic.wav');
     }
 
     create() {
