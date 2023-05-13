@@ -12,6 +12,7 @@ class Play extends Phaser.Scene {
 
     create() {
         // Inputs
+        this.background = this.add.tileSprite(0, 0, 400, 180, 'background').setOrigin(0, 0);
         keyG = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.G)
         keyR = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R)
         keyLEFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT)
@@ -60,11 +61,23 @@ class Play extends Phaser.Scene {
 
         // Player
         this.wizard = new Wizard(this, borderUISize + borderPadding, game.config.height - borderUISize - borderPadding - 15, 'wizard').setOrigin(.5, 0);
+
+        this.anims.create({
+            key: 'gravity',
+            frames: this.anims.generateFrameNumbers('wizard', {start: 0, end: 9, first: 0}),
+            framerate: 30
+        })
+
+        this.anims.create({
+            key:
+             'gover',
+            frames: this.anims.generateFrameNumbers('wizard', {start: 0, end: 9, first: 0}),
+            framerate: 30
+        })
         
         // Enemies
         this.batGroup = new BatGroup(this);
-        this.batGroup.randomizePlacement();
-
+'e'
         // Game Logic
         this.gameOver = false;
         this.speedMultiplier = game.settings.speedMultiplier
@@ -95,8 +108,14 @@ class Play extends Phaser.Scene {
 
     update() {
         // Scroll Background
-        // this.starfield.tilePositionX -= 4;
+        this.background.tilePositionX -= 3;
 
+        if (!this.gameOver) {
+            this.wizard.update();
+            this.bat.update();
+            this.batGroup.update();
+        }
+        
         if (this.gameOver) {
             this.add.text(game.config.width / 2, game.config.height / 2, 'GAME OVER', this.textConfig).setOrigin(.5);
             this.add.text(game.config.width / 2, game.config.height / 2 + 64, 'Press (R) to Restart or <- for Menu', this.textConfig).setOrigin(.5);
