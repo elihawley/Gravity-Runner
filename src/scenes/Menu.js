@@ -13,7 +13,7 @@ class Menu extends Phaser.Scene {
     create() {
         let menuConfig = {
             fontFamily: 'Georgia',
-            fontSize: '20px',
+            fontSize: '18px',
             backgroundColor: 'brown',
             color: 'white',
             align: 'right',
@@ -25,7 +25,7 @@ class Menu extends Phaser.Scene {
         };
 
 
-        let t = this.add.text(game.config.width / 2, game.config.height / 2 - borderUISize - borderPadding, 'GRAVITY RUNNER', menuConfig).setOrigin(.5);
+        let t = this.add.text(game.config.width / 2, game.config.height / 3 - borderUISize - borderPadding, 'GRAVITY RUNNER', menuConfig).setOrigin(.5);
         let t1 = this.add.text(game.config.width / 2, game.config.height / 2, 'Use (G) to change gravity. Don\'t get COVID!', menuConfig).setOrigin(.5);
         menuConfig.backgroundColor = '#00FF00';
         menuConfig.color = '#000';
