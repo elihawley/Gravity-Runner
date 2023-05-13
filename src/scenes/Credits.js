@@ -18,12 +18,12 @@ class Credits extends Phaser.Scene {
         };
 
 
-        this.add.text(game.config.width / 2, game.config.height - borderUISize - borderPadding, 'CREDITS', menuConfig).setOrigin(.5);
-        this.add.text(game.config.width / 2, game.config.height - borderUISize * 2 - borderPadding, 'Press (C) to return', Object.assign({}, menuConfig, {backgroundColor: '#00FF00', color: '#000'})).setOrigin(.5);
-        this.add.text(game.config.width / 2, game.config.height - borderUISize * 3 - borderPadding, 'Developer: Elia Hawley', menuConfig).setOrigin(.5);
-        this.add.text(game.config.width / 2, game.config.height - borderUISize * 4 - borderPadding, 'Assets: Asesprite', menuConfig).setOrigin(.5);
-        this.add.text(game.config.width / 2, game.config.height - borderUISize * 5 - borderPadding, 'Music: TODO', menuConfig).setOrigin(.5);
-        this.add.text(game.config.width / 2, game.config.height - borderUISize * 6 - borderPadding, 'SFX: jsfxr', menuConfig).setOrigin(.5);
+        this.add.text(game.config.width / 2, borderUISize * 2 + borderPadding, 'CREDITS', menuConfig).setOrigin(.5);
+        this.add.text(game.config.width / 2, borderUISize * 3 + borderPadding, 'Press (C) to return', Object.assign({}, menuConfig, {backgroundColor: '#00FF00', color: '#000'})).setOrigin(.5);
+        this.add.text(game.config.width / 2, borderUISize * 5 + borderPadding, 'Developer: Elia Hawley', menuConfig).setOrigin(.5);
+        this.add.text(game.config.width / 2, borderUISize * 6 + borderPadding, 'Assets: Asesprite', menuConfig).setOrigin(.5);
+        this.add.text(game.config.width / 2, borderUISize * 7 + borderPadding, 'Music: TODO', menuConfig).setOrigin(.5);
+        this.add.text(game.config.width / 2, borderUISize * 8 + borderPadding, 'SFX: jsfxr', menuConfig).setOrigin(.5);
 
         keyC = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.C)
     }
