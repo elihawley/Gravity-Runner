@@ -7,8 +7,6 @@ class Wizard extends Phaser.GameObjects.Sprite {
         this.gravityOn = true;
         this.moveSpeed = 8;
 
-        // this.sfxRocket = scene.sound.add('sfx_rocket');
-
         this.scene = scene;
     }
 
@@ -24,7 +22,7 @@ class Wizard extends Phaser.GameObjects.Sprite {
         if (Phaser.Input.Keyboard.JustDown(keyG)) {
             this.gravityOn = !this.gravityOn;
             this.flipY = !this.flipY;
-            // this.sfxRocket.play();
+            this.scene.sound.play('sfx_changegravity');
         }
     }
 }
