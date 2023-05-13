@@ -6,8 +6,9 @@ class Play extends Phaser.Scene {
 
     preload() {
         this.load.image('background','./assets/background.png');
-        this.load.image('wizard', './assets/wizard.png');
-        this.load.image('bat', './assets/bat.png');
+        this.load.spritesheet('wizard', './assets/wizard-sheet.png', { frameWidth: 15, frameHeight: 30, startFrame: 0, endFrame: 1 });
+        this.load.spritesheet('bat', './assets/bat-sheet.png', { frameWidth: 15, frameHeight: 10, startFrame: 0, endFrame: 1 });
+        this.load.image('bat_particle', './assets/bat_particle.png');
     }
 
     create() {
@@ -41,31 +42,26 @@ class Play extends Phaser.Scene {
 
         // Player
         this.wizard = new Wizard(this, borderUISize + borderPadding, game.config.height - borderUISize - borderPadding - (30*1.5), 'wizard').setOrigin(.5, 0);
+        this.wizard.anims.create({
+            key: 'anim_wizard',
+            frames: this.anims.generateFrameNumbers('wizard', {start: 0, end: 1, first: 0}),
+            frameRate: 2,
+            repeat: -1,
+        })
+        this.wizard.play('anim_wizard');
 
-        // this.anims.create({
-        //     key: 'gravity',
-        //     frames: this.anims.generateFrameNumbers('wizard', {start: 0, end: 9, first: 0}),
-        //     framerate: 30
-        // })
-
-        // this.anims.create({
-        //     key:
-        //      'gover',
-        //     frames: this.anims.generateFrameNumbers('wizard', {start: 0, end: 9, first: 0}),
-        //     framerate: 30
-        // })
         // Explosion particles
-        // this.particleEmitter = this.add.particles(0, 0, 'explosion_particle', {
-        //     frequency: -1, // put in explode mode
-        //     speed: 200,
-        //     lifespan: 200,
-        //     bounds: {
-        //         x: borderUISize,
-        //         y: borderUISize + borderPadding + borderUISize * 2,
-        //         width: game.config.width - 2 * borderUISize,
-        //         height: game.config.height - borderUISize - (borderUISize + borderPadding + borderUISize * 2),
-        //     }
-        // })
+        this.particleEmitter = this.add.particles(0, 0, 'bat_particle', {
+            frequency: -1, // put in explode mode
+            speed: 50,
+            lifespan: 200,
+            bounds: {
+                x: borderUISize,
+                y: borderUISize + borderPadding + borderUISize * 2,
+                width: game.config.width - 2 * borderUISize,
+                height: game.config.height - borderUISize - (borderUISize + borderPadding + borderUISize * 2),
+            }
+        })
         
         // Enemies
         this.batGroup = new BatGroup(this);
@@ -127,45 +123,32 @@ class Play extends Phaser.Scene {
 
     checkCollision(wizard, obstacles) {
         for (const obstacle of obstacles) {
-            if (wizard.x < obstacle.x + obstacle.displayWidth &&
-                wizard.x + wizard.displayWidth > obstacle.x &&
-                wizard.y < obstacle.y + obstacle.displayHeight && 
-                wizard.displayHeight + wizard.y > obstacle.y) {
-                return true;
+            if (obstacle.visible) {
+                if (wizard.x < obstacle.x + obstacle.displayWidth &&
+                    wizard.x + wizard.displayWidth > obstacle.x &&
+                    wizard.y < obstacle.y + obstacle.displayHeight && 
+                    wizard.displayHeight + wizard.y > obstacle.y) {
+    
+                        if (!wizard.gravityOn && ((wizard.y < (obstacle.y + obstacle.displayHeight)) && (wizard.y > (obstacle.y + obstacle.displayHeight/3)))) {
+                            // Stomp on upper bats
+                            obstacle.visible = false;
+                            this.batExplode(wizard, obstacle);
+                            return false;
+                        } else if (wizard.gravityOn && (((wizard.displayHeight + wizard.y) > obstacle.y) && ((wizard.displayHeight + wizard.y) < (obstacle.y + obstacle.displayHeight * (2/3))))) {
+                            // Stomp on lower bats
+                            obstacle.visible = false;
+                            this.batExplode(wizard, obstacle);
+                            return false;
+                        } else {
+                            return true;
+                        }
+                }
             }
         }
         return false;
     }
 
-    // dieOfCovid(wizard) {
-
-    // }
-
-    // batExplode(bat) {
-    //     bat.alpha = 0;
-
-    //     this.particleEmitter.explode(15, bat.x, bat.y)
-
-    //     let boom = this.add.sprite(bat.x, bat.y, 'explosion').setOrigin(0, 0);
-    //     boom.anims.play('explode');
-    //     boom.on('animationcomplete', () => {
-    //         bat.reset();
-    //         bat.alpha = 1;
-    //         boom.destroy();
-    //     });
-
-    //     let eChoice = Math.floor(Math.random() * 4);
-    //     if (eChoice === 0) {
-    //         this.sound.play('sfx_explosion1');
-    //     }
-    //     else if (eChoice === 1) {
-    //         this.sound.play('sfx_explosion2');
-    //     }
-    //     else if (eChoice === 2) {
-    //         this.sound.play('sfx_explosion3');
-    //     }
-    //     else {
-    //         this.sound.play('sfx_explosion4');
-    //     }
-    // }
+    batExplode(wizard, bat) {
+        this.particleEmitter.explode(5, bat.x, bat.y, {angle: wizard.gravityOn ? 135 : 45});
+    }
 }
