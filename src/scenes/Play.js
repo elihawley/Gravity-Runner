@@ -1,93 +1,154 @@
-class Play extends Phaser.scene {
+class Play extends Phaser.Scene {
     constructor() {
-        super('playscene')        
+        super('playScene')        
     }
 
 
     preload() {
-        // this.load.image('rocket', './assets/rocket.png');
-        // this.load.spritesheet('explosion', './assets/explosion.png', { frameWidth: 64, frameHeight: 32, startFrame: 0, endFrame: 9 });
-        // this.load.image('explosion_particle', './assets/explosion_particle.png');
-        // this.load.audio('sfx_menu','./assets/menu_music.wav');
+        this.load.image('background','./assets/background.png');
+        this.load.image('wizard', './assets/wizard.png');
+        this.load.image('bat', './assets/bat.png');
     }
 
     create() {
         // Inputs
-        keyUP = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP)
-        keyDOWN = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN)
+        keyG = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.G)
+        keyR = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R)
         keyLEFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT)
         keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT)
 
+        // Text Config
+        let textConfig = {
+            fontFamily: 'Courier',
+            fontSize: '28px',
+            backgroundColor: '#F3B141',
+            color: '#843605',
+            align: 'right',
+            padding: {
+                top: 5,
+                bottom: 5,
+            },
+            fixedWidth: 100,
+        };
+
         // Background Music
-        // let mmusic = this.sound.add("sfx_menu", {volume: 1, loop: true});
-        // mmusic.play()
+        let mmusic = this.sound.add("sfx_music", {volume: 1, loop: true});
+        mmusic.play()
 
 
         // Background Image
         // this.starfield = this.add.tileSprite(0, 0, 640, 480, 'starfield').setOrigin(0, 0);
 
+        // Explosion Animation
+        // this.anims.create({
+        //     key: 'explode',
+        //     frames: this.anims.generateFrameNumbers('explosion', { start: 0, end: 9, first: 0 }),
+        //     frameRate: 30,
+        // });
+        // Explosion particles
+        // this.particleEmitter = this.add.particles(0, 0, 'explosion_particle', {
+        //     frequency: -1, // put in explode mode
+        //     speed: 200,
+        //     lifespan: 200,
+        //     bounds: {
+        //         x: borderUISize,
+        //         y: borderUISize + borderPadding + borderUISize * 2,
+        //         width: game.config.width - 2 * borderUISize,
+        //         height: game.config.height - borderUISize - (borderUISize + borderPadding + borderUISize * 2),
+        //     }
+        // })
 
         // Player
-        // this.p1Rocket = new Rocket(this, game.config.width/2, game.config.height - borderUISize - borderPadding, 'rocket').setOrigin(.5, 0);
+        this.wizard = new Wizard(this, borderUISize + borderPadding, game.config.height - borderUISize - borderPadding - 15, 'wizard').setOrigin(.5, 0);
         
         // Enemies
-        // this.ship01 = new Spaceship(this, game.config.width + borderUISize * 6, borderUISize * 4, 'spaceship', 0, 30).setOrigin(0, 0);
+        this.batGroup = new BatGroup(this);
+        this.batGroup.randomizePlacement();
+
+        // Game Logic
+        this.gameOver = false;
+        this.speedMultiplier = game.settings.speedMultiplier
+        this.waveDifficultyLevel = game.settings.waveDifficultyLevel
+
+        this.timeSurvived = 0;
+        this.timeSurvivedText = this.add.text(game.config.width - 2*(borderUISize + borderPadding) - (borderUISize + borderPadding * 2), borderUISize + borderPadding * 2, Math.round(this.timeSurvived / 1000), textConfig);
+        this.timeSurvivedClock = this.time.addEvent({
+            callback: () => {
+                if (this.gameOver) {
+                    this.timeSurvivedClock.remove();
+                }
+
+                this.timeSurvived += 100;
+                this.add.text(game.config.width - 2*(borderUISize + borderPadding) - (borderUISize + borderPadding * 2), borderUISize + borderPadding * 2, Math.round(this.timeSurvived / 1000), textConfig); 
+
+                if (this.speedMultiplier <= 5) {
+                    this.speedMultiplier = Math.ceil(this.timeSurvived / 1000);
+                }
+                this.waveDifficultyLevel += .1;
+            },
+            callbackScope: this,
+            delay: 100,
+            loop: true,
+        });
+
     }
 
     update() {
-        // speedMultiplier: 1,
-        // waveDifficultyLevel: 1,
-
         // Scroll Background
         // this.starfield.tilePositionX -= 4;
 
-        // if (this.gameOver && Phaser.Input.Keyboard.JustDown(keyR)) {
-        //     this.scene.restart();
-        // }
-        // if (this.gameOver && Phaser.Input.Keyboard.JustDown(keyLEFT)) {
-        //     this.scene.start('menuScene');
-        // }
+        if (this.gameOver) {
+            this.add.text(game.config.width / 2, game.config.height / 2, 'GAME OVER', this.textConfig).setOrigin(.5);
+            this.add.text(game.config.width / 2, game.config.height / 2 + 64, 'Press (R) to Restart or <- for Menu', this.textConfig).setOrigin(.5);
+        }
 
-        // if (!this.gameOver) {
-        //     this.p1Rocket.update();
-        //     this.ship01.update();
-        //     this.ship02.update();
-        //     this.ship03.update();
-        // }
+        if (this.gameOver && Phaser.Input.Keyboard.JustDown(keyR)) {
+            this.scene.restart();
+        }
+        if (this.gameOver && Phaser.Input.Keyboard.JustDown(keyLEFT)) {
+            this.scene.start('menuScene');
+        }
 
-        // if (this.p1Rocket.isFiring) {
-        //     this.fireText.alpha = 1;
-        // } else {
-        //     this.fireText.alpha = 0;
-        // }
+        if (!this.gameOver) {
+            this.wizard.update();
+            this.batGroup.update();
+        }
 
-        // if (this.checkCollision(this.p1Rocket, this.ship03)) {
-        //     this.p1Rocket.reset();
-        //     this.shipExplode(this.ship03);
-        // }
+        if (this.checkCollision(this.wizard, this.batGroup)) {
+            this.gameOver = true;
+        }
     }
 
-    // checkCollision(rocket, ship) {
-    //     if (rocket.x < ship.x + ship.width &&
-    //         rocket.x + rocket.width > ship.x &&
-    //         rocket.y < ship.y + ship.height && 
-    //         rocket.height + rocket.y > ship.y) {
-    //         return true;
-    //     } else {
-    //         return false;
-    //     }
+    checkCollision(wizard, batGroup) {
+        const bats = batGroup.getMatching('active', true);
+
+        for (const bat of bats) {
+            if (wizard.x < bat.x + bat.displayWidth &&
+                wizard.x + wizard.displayWidth > bat.x &&
+                wizard.y < bat.y + bat.displayHeight && 
+                wizard.displayHeight + wizard.y > bat.y) {
+                
+                // this.batExplode(this.bat);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // dieOfCovid(wizard) {
+
     // }
 
-    // shipExplode(ship) {
-    //     ship.alpha = 0;
+    // batExplode(bat) {
+    //     bat.alpha = 0;
 
-    //     this.particleEmitter.explode(15, ship.x, ship.y)
+    //     this.particleEmitter.explode(15, bat.x, bat.y)
 
-    //     let boom = this.add.sprite(ship.x, ship.y, 'explosion').setOrigin(0, 0);
+    //     let boom = this.add.sprite(bat.x, bat.y, 'explosion').setOrigin(0, 0);
     //     boom.anims.play('explode');
     //     boom.on('animationcomplete', () => {
-    //         ship.reset();
-    //         ship.alpha = 1;
+    //         bat.reset();
+    //         bat.alpha = 1;
     //         boom.destroy();
     //     });
 
@@ -105,15 +166,4 @@ class Play extends Phaser.scene {
     //         this.sound.play('sfx_explosion4');
     //     }
     // }
-}
-class Play extends Phaser.Scene {
-    constructor() {
-        super("playScene");
-    }
-
-    preload() {
-        this.load.image('background','./assets/background.png');
-        this.load.image('wizard','./assets/wizard.png');
-        this.load.image('bat', './assets/bat.png');
-    }
 }
