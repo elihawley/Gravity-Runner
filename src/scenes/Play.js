@@ -12,7 +12,6 @@ class Play extends Phaser.Scene {
 
     create() {
         // Inputs
-        this.background = this.add.tileSprite(0, 0, 400, 180, 'background').setOrigin(0, 0);
         keyG = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.G)
         keyR = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R)
         keyLEFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT)
@@ -21,15 +20,15 @@ class Play extends Phaser.Scene {
         // Text Config
         let textConfig = {
             fontFamily: 'Courier',
-            fontSize: '28px',
+            fontSize: '12px',
             backgroundColor: '#F3B141',
             color: '#843605',
-            align: 'right',
+            align: 'left',
             padding: {
                 top: 5,
                 bottom: 5,
             },
-            fixedWidth: 100,
+            fixedWidth: 35,
         };
 
         // Background Music
@@ -38,14 +37,23 @@ class Play extends Phaser.Scene {
 
 
         // Background Image
-        // this.starfield = this.add.tileSprite(0, 0, 640, 480, 'starfield').setOrigin(0, 0);
+        this.background = this.add.tileSprite(0, 0, 400, 180, 'background').setOrigin(0, 0);
 
-        // Explosion Animation
+        // Player
+        this.wizard = new Wizard(this, borderUISize + borderPadding, game.config.height - borderUISize - borderPadding - (30*1.5), 'wizard').setOrigin(.5, 0);
+
         // this.anims.create({
-        //     key: 'explode',
-        //     frames: this.anims.generateFrameNumbers('explosion', { start: 0, end: 9, first: 0 }),
-        //     frameRate: 30,
-        // });
+        //     key: 'gravity',
+        //     frames: this.anims.generateFrameNumbers('wizard', {start: 0, end: 9, first: 0}),
+        //     framerate: 30
+        // })
+
+        // this.anims.create({
+        //     key:
+        //      'gover',
+        //     frames: this.anims.generateFrameNumbers('wizard', {start: 0, end: 9, first: 0}),
+        //     framerate: 30
+        // })
         // Explosion particles
         // this.particleEmitter = this.add.particles(0, 0, 'explosion_particle', {
         //     frequency: -1, // put in explode mode
@@ -58,33 +66,17 @@ class Play extends Phaser.Scene {
         //         height: game.config.height - borderUISize - (borderUISize + borderPadding + borderUISize * 2),
         //     }
         // })
-
-        // Player
-        this.wizard = new Wizard(this, borderUISize + borderPadding, game.config.height - borderUISize - borderPadding - 15, 'wizard').setOrigin(.5, 0);
-
-        this.anims.create({
-            key: 'gravity',
-            frames: this.anims.generateFrameNumbers('wizard', {start: 0, end: 9, first: 0}),
-            framerate: 30
-        })
-
-        this.anims.create({
-            key:
-             'gover',
-            frames: this.anims.generateFrameNumbers('wizard', {start: 0, end: 9, first: 0}),
-            framerate: 30
-        })
         
         // Enemies
         this.batGroup = new BatGroup(this);
-'e'
+
         // Game Logic
         this.gameOver = false;
         this.speedMultiplier = game.settings.speedMultiplier
         this.waveDifficultyLevel = game.settings.waveDifficultyLevel
 
         this.timeSurvived = 0;
-        this.timeSurvivedText = this.add.text(game.config.width - 2*(borderUISize + borderPadding) - (borderUISize + borderPadding * 2), borderUISize + borderPadding * 2, Math.round(this.timeSurvived / 1000), textConfig);
+        this.timeSurvivedText = this.add.text(game.config.width - 3*(borderUISize + borderPadding), borderUISize + borderPadding * 2, Math.round(this.timeSurvived / 1000), textConfig);
         this.timeSurvivedClock = this.time.addEvent({
             callback: () => {
                 if (this.gameOver) {
@@ -92,10 +84,10 @@ class Play extends Phaser.Scene {
                 }
 
                 this.timeSurvived += 100;
-                this.add.text(game.config.width - 2*(borderUISize + borderPadding) - (borderUISize + borderPadding * 2), borderUISize + borderPadding * 2, Math.round(this.timeSurvived / 1000), textConfig); 
+                this.timeSurvivedText.text = Math.round(this.timeSurvived / 1000);
 
-                if (this.speedMultiplier <= 5) {
-                    this.speedMultiplier = Math.ceil(this.timeSurvived / 1000);
+                if (this.speedMultiplier <= 3) {
+                    this.speedMultiplier = 1 + Math.ceil(this.timeSurvived / 1000) * .03;
                 }
                 this.waveDifficultyLevel += .1;
             },
@@ -109,12 +101,6 @@ class Play extends Phaser.Scene {
     update() {
         // Scroll Background
         this.background.tilePositionX -= 3;
-
-        if (!this.gameOver) {
-            this.wizard.update();
-            this.bat.update();
-            this.batGroup.update();
-        }
         
         if (this.gameOver) {
             this.add.text(game.config.width / 2, game.config.height / 2, 'GAME OVER', this.textConfig).setOrigin(.5);
@@ -129,27 +115,22 @@ class Play extends Phaser.Scene {
         }
 
         if (!this.gameOver) {
-            this.sound.play('sfx_gameover');
             this.wizard.update();
             this.batGroup.update();
         }
 
-        if (this.checkCollision(this.wizard, this.batGroup)) {
-            
+        if (this.checkCollision(this.wizard, [...this.batGroup.getMatching('active', true)])) {
             this.gameOver = true;
+            this.sound.play('sfx_gameover');
         }
     }
 
-    checkCollision(wizard, batGroup) {
-        const bats = batGroup.getMatching('active', true);
-
-        for (const bat of bats) {
-            if (wizard.x < bat.x + bat.displayWidth &&
-                wizard.x + wizard.displayWidth > bat.x &&
-                wizard.y < bat.y + bat.displayHeight && 
-                wizard.displayHeight + wizard.y > bat.y) {
-                
-                // this.batExplode(this.bat);
+    checkCollision(wizard, obstacles) {
+        for (const obstacle of obstacles) {
+            if (wizard.x < obstacle.x + obstacle.displayWidth &&
+                wizard.x + wizard.displayWidth > obstacle.x &&
+                wizard.y < obstacle.y + obstacle.displayHeight && 
+                wizard.displayHeight + wizard.y > obstacle.y) {
                 return true;
             }
         }
