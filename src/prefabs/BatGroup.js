@@ -12,6 +12,10 @@ class BatGroup extends Phaser.GameObjects.Group {
             quantity: 1,
             active: true,
             visible: true,
+            setXY: {
+                x: game.config.width - borderUISize - borderPadding,
+                y: (Math.random() < .5) ? (4*borderUISize + 2*borderPadding) : (game.config.height - 2*borderUISize - 2*borderPadding),
+            },
             key: 'bat'
         })
     }
@@ -21,21 +25,25 @@ class BatGroup extends Phaser.GameObjects.Group {
         this.updateNumBats();
     }
 
-    randomizePlacement() {
-        const spawnBounds = new Phaser.Geom.Rectangle(game.config.width - borderUISize, 2*borderUISize + 2*borderPadding, borderPadding, game.config.height - 4*borderUISize - 2*borderPadding);
+    // randomizePlacement() {
+    //     const spawnBounds = new Phaser.Geom.Rectangle(game.config.width - borderUISize, 2*borderUISize + 2*borderPadding, borderPadding, game.config.height - 4*borderUISize - 2*borderPadding);
 
-        Phaser.Actions.RandomRectangle(this.getChildren(), spawnBounds);
-    }
+    //     Phaser.Actions.RandomRectangle(this.getChildren(), spawnBounds);
+    // }
 
     updateNumBats() {
         const currWaveDifficulty = this.scene.waveDifficultyLevel
-        this.numBats = Math.min(30, Math.floor(currWaveDifficulty / 2));
+        this.numBats = Math.min(30, Math.floor(currWaveDifficulty / 10));
         for (let i = 0; i < this.numBats - this.countActive(); i++) {
             this.createFromConfig({
                 classType: Bat,
                 quantity: 1,
                 active: true,
                 visible: true,
+                setXY: {
+                    x: game.config.width - borderUISize - borderPadding,
+                    y: (Math.random() < .5) ? (4*borderUISize + 2*borderPadding) : (game.config.height - 2*borderUISize - 2*borderPadding),
+                },
                 key: 'bat'
             })
         }
