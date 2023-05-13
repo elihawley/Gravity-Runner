@@ -129,11 +129,13 @@ class Play extends Phaser.Scene {
         }
 
         if (!this.gameOver) {
+            this.sound.play('sfx_gameover');
             this.wizard.update();
             this.batGroup.update();
         }
 
         if (this.checkCollision(this.wizard, this.batGroup)) {
+            
             this.gameOver = true;
         }
     }
