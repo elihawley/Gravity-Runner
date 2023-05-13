@@ -47,16 +47,16 @@ class Menu extends Phaser.Scene {
             this.sound.play('sfx_select');
             this.scene.start('playScene');
         }
-        if (Phaser.Input.Keyboard.JustDown(keyRIGHT)) {
+         else if (Phaser.Input.Keyboard.JustDown(keyRIGHT)) {
             // hard mode
             game.settings = {
                 speedMultiplier: 2,
-                waveDifficultyLevel: 5,
+                waveDifficultyLevel: 30,
             };
             this.sound.play('sfx_select');
             this.scene.start('playScene');
         }
-        if (Phaser.Input.Keyboard.JustDown(keyC)) {
+        else if (Phaser.Input.Keyboard.JustDown(keyC)) {
             // credits
             this.sound.play('sfx_select');
             this.scene.start('creditsScene');
