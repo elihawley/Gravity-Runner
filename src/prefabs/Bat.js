@@ -9,8 +9,6 @@ class Bat extends Phaser.GameObjects.Sprite {
     }
 
     update() {
-        // this.x += this.moveSpeed * Math.cos(180 + this.angle);
-        // this.y += this.moveSpeed * Math.sin(this.angle);
         this.x -= this.moveSpeed;
 
         // reset on miss
@@ -25,8 +23,7 @@ class Bat extends Phaser.GameObjects.Sprite {
     resetToSpawnArea() {
         this.x = game.config.width - borderUISize - borderPadding;
         this.y = (Math.random() < .5) ? (4*borderUISize + 2*borderPadding) : (game.config.height - 2*borderUISize - 2*borderPadding);
-        // this.y = 2*borderUISize + 2*borderPadding + Math.random()*(game.config.height - 4*borderUISize - 2*borderPadding);
-        // this.angle = -.05 + Math.random() * .1;
+        this.visible = true;
         this.moveSpeed = 1 + Math.random() * this.scene.speedMultiplier;
     }
 }
